@@ -3,6 +3,8 @@
 #include <map>
 
 Gyst::Gyst(int _min, int _max, int _count): min{ _min }, max{ _max }, count{ _count } {
+	if (max - min < count)
+		throw std::invalid_argument("Number of bins must be equal or less than difference between max and min.");
 	window = (max - min)/count;
 	for (int i = 0; i < count; i++)
 		data[i] = 0;
@@ -16,12 +18,14 @@ void Gyst::add_elem(int elem){
 	for (int i = 0; i < count; i++) {
 		if (min + (i * window) < elem && elem < min + ((i + 1) * window)) {
 			data[i]++;
-			continue;
+			break;
 		}
 	}
 }
 
 Gyst::Gyst(int _min, int _max, int _count, std::vector<int> _data): min { _min }, max{ _max }, count{ _count } {
+	if (max - min < count)
+		throw std::invalid_argument("Number of bins must be equal or less than difference between max and min.");
 	window = (max - min) / count;
 	for (int i = 0; i < count; i++)
 		data[i] = 0;
@@ -72,12 +76,11 @@ int Gyst::prop_validate(const Gyst& first_hist, const Gyst& second_hist) {
 	return 0;
 }
 
-Gyst Gyst::operator+(const Gyst& another_hist) const {
-	if (!prop_validate(*this, another_hist)) {
+Gyst Gyst::operator+(const Gyst& other) const {
+	if (!(this->min == other.min && this->max == other.max && this->count == other.count))
 		throw std::invalid_argument("invalid operation '+' ");
-	}
-	Gyst result{ *this };
-	for (const auto node : another_hist.data) {
+	Gyst result(*this);
+	for (const auto& node : other.data) {
 		result.data[node.first] += node.second;
 	}
 	return result;
@@ -123,15 +126,15 @@ auto Gyst::end() const {
 	return data.end();
 }
 
-const int& Gyst::at(int key_for_bin) const {
-	return data.at(key_for_bin);
+const int& Gyst::at(int bin_num) const {
+	return data.at(bin_num);
 }
 
-std::string Gyst::Show_Gyst() const {
-	std::string output;
-	for (auto& map_node : data)
-	{
-		output += map_node.first + " " + map_node.second + '\n';
-	}
-	return output;
-}
+//std::string Gyst::Show_Gyst() const {
+//	std::string output;
+//	for (auto& map_node : data)
+//	{
+//		output += map_node.first + " " + map_node.second + '\n';
+//	}
+//	return output;
+//}

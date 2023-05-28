@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <stdexcept>
 //parser->vector <int>
 //gyst(int min, int max, int count, vector<int> data);
 class Gyst{
@@ -22,7 +23,7 @@ public:
 	void add_data(std::vector<int> _data);
 	void add_data(int _data);
 
-	const size_t& at(int bin_num) const;
+	const int& at(int bin_num) const;
 	std::string GetResult();
 
 private:
