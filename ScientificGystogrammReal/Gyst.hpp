@@ -17,14 +17,14 @@ public:
 	
 	Gyst operator+(const Gyst& other) const;
 	Gyst operator-(const Gyst& other) const;
-	bool operator==(const Gyst& other) const { return data == other.data; };
-	bool operator!=(const Gyst& other) const { return data != other.data; };
+	bool operator==(const Gyst& other) const;
+	bool operator!=(const Gyst& other) const;
 
 	void add_data(std::vector<int> _data);
 	void add_data(int _data);
 
 	const int& at(int bin_num) const;
-	std::string GetResult();
+	std::string string_format() const;
 
 private:
 	int min, max, count;

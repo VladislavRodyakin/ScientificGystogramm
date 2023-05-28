@@ -3,9 +3,9 @@
 #include <map>
 
 Gyst::Gyst(int _min, int _max, int _count): min{ _min }, max{ _max }, count{ _count } {
-	if (max - min < count)
+	if (max - min < count-1)
 		throw std::invalid_argument("Number of bins must be equal or less than difference between max and min.");
-	window = (max - min)/count;
+	window = (max - min)/(count-1);
 	for (int i = 0; i < count; i++)
 		data[i] = 0;
 }
@@ -24,9 +24,9 @@ void Gyst::add_elem(int elem){
 }
 
 Gyst::Gyst(int _min, int _max, int _count, std::vector<int> _data): min { _min }, max{ _max }, count{ _count } {
-	if (max - min < count)
+	if (max - min < count - 1)
 		throw std::invalid_argument("Number of bins must be equal or less than difference between max and min.");
-	window = (max - min) / count;
+	window = (max - min) / (count - 1);
 	for (int i = 0; i < count; i++)
 		data[i] = 0;
 	for (int& i : _data) {
@@ -78,63 +78,46 @@ int Gyst::prop_validate(const Gyst& first_hist, const Gyst& second_hist) {
 
 Gyst Gyst::operator+(const Gyst& other) const {
 	if (!(this->min == other.min && this->max == other.max && this->count == other.count))
-		throw std::invalid_argument("invalid operation '+' ");
+		throw std::invalid_argument("'+' operation could only be conducted on gystogramms with equal min, max and bin count");
 	Gyst result(*this);
-	for (const auto& node : other.data) {
-		result.data[node.first] += node.second;
+	for (auto& node_data: other.data)
+		result.data[node_data.first] += node_data.second;
+	return result;
+}
+
+Gyst Gyst::operator-(const Gyst& other) const {
+	if (!(this->min == other.min && this->max == other.max && this->count == other.count))
+		throw std::invalid_argument("'-' operation could only be conducted on gystogramms with equal min, max and bin count");
+	Gyst result(*this);
+	for (auto& node_data: other.data) {
+		int difference = result.data.at(node_data.first) - other.data.at(node_data.first);
+		if (difference < 0)
+			result.data.at(node_data.first) = 0;
+		else
+			result.data.at(node_data.first) = difference;
 	}
 	return result;
 }
 
-Gyst Gyst::operator-(const Gyst& another_hist) const
-{
-	if (!prop_validate(*this, another_hist)) {
-		throw std::invalid_argument("invalid operation '-' ");
-	}
-	Gyst result(*this);
-	for (auto const map_node : another_hist.data) {
-		int difference = result.data.at(map_node.first) - another_hist.data.at(map_node.first);
-		if (difference < 0) {
-			result.data.at(map_node.first) = 0;
-		}
-		else {
-			result.data.at(map_node.first) = difference;
-		}
-	}
-	return result;
+bool Gyst::operator==(const Gyst& other) const {
+	if (!(this->min == other.min && this->max == other.max && this->count == other.count))
+		throw std::invalid_argument("'==' operation could only be conducted on gystogramms with equal min, max and bin count");
+	return this->data == other.data;
 }
 
-bool Gyst::operator==(const Gyst& another_hist) const {
-	if (!prop_validate(*this, another_hist)) {
-		throw std::invalid_argument("invalid operation '==' ");
-	}
-	return data == another_hist.data;
-}
-
-bool Gyst::operator!=(const Gyst& another_hist) const {
-	if (!prop_validate(*this, another_hist)) {
-		throw std::invalid_argument("invalid operation '==' ");
-	}
-	return data != another_hist.data;
-}
-
-auto Gyst::begin() const {
-	return data.begin();
-}
-
-auto Gyst::end() const {
-	return data.end();
+bool Gyst::operator!=(const Gyst& other) const {
+	if (!(this->min == other.min && this->max == other.max && this->count == other.count))
+		throw std::invalid_argument("'!=' operation could only be conducted on gystogramms with equal min, max and bin count");
+	return data != other.data;
 }
 
 const int& Gyst::at(int bin_num) const {
 	return data.at(bin_num);
 }
 
-//std::string Gyst::Show_Gyst() const {
-//	std::string output;
-//	for (auto& map_node : data)
-//	{
-//		output += map_node.first + " " + map_node.second + '\n';
-//	}
-//	return output;
-//}
+std::string Gyst::string_format() const {
+	std::string output;
+	for (auto& node_data: data)
+		output += node_data.first + " " + node_data.second + '\n';
+	return output;
+}
