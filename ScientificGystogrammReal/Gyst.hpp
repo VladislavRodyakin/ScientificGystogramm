@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <utility>
 //parser->vector <int>
 //gyst(int min, int max, int count, vector<int> data);
 class Gyst{
@@ -12,9 +13,12 @@ public:
 	Gyst(const Gyst& other) = default;
 	Gyst& operator=(const Gyst& other) = default;
 
-	auto begin() const { return data.begin(); };
-	auto end() const { return data.end(); };
-	
+	size_t begin() const;
+	size_t end() const;
+	/*std::pair<const int, int> begin() const { return data.begin(); };
+	std::pair<const int, int> end() const { return data.end(); };*/
+	/*result.second = iterstor.first ->
+		std::pair<const int, int>*/
 	Gyst operator+(const Gyst& other) const;
 	Gyst operator-(const Gyst& other) const;
 	bool operator==(const Gyst& other) const;
@@ -31,5 +35,4 @@ private:
 	float window;
 	std::map<int, int> data;
 	void add_elem(int elem);
-	int prop_validate(const Gyst& first_hist, const Gyst& second_hist);
 };
